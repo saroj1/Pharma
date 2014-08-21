@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Pharma</string>
+    <string name="Name">Name</string>
+     <string name="Add">Address</string>
+      <string name="Mob">Mobile No</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

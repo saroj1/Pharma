@@ -1,6 +1,7 @@
 package com.example.pharma;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,7 +48,7 @@ public class ServerUploadTask extends AsyncTask<Void, Void, String>{
 			HttpClient httpClient=new DefaultHttpClient();
 			
 			HttpPost httpPost=new HttpPost("http://192.168.2.69:8065/api/upload");
-			FileBody bin=new FileBody(image);
+			FileBody bin=new FileBody(new File("image"));
 			
 			MultipartEntityBuilder builder= MultipartEntityBuilder.create();
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);

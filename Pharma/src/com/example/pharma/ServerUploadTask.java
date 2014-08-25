@@ -2,7 +2,10 @@ package com.example.pharma;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -14,8 +17,6 @@ import android.widget.Toast;
 public class ServerUploadTask extends AsyncTask<Void, Void, String>{
 
 	private String webAddressToPost=" http://192.168.2.69:8065/api/upload ";
-	//ProgressDialog progress;
-	//private ProgressDialog dialog=new ProgressDialog();
 	
 	
 	@Override
@@ -23,21 +24,22 @@ public class ServerUploadTask extends AsyncTask<Void, Void, String>{
 		// TODO Auto-generated method stub
 		super.onPreExecute();
 		
-		//dialog.setMessage("Uploading....");
+		
 		
 	}
 	@Override
 	protected String doInBackground(Void... params) {
 		
 		// TODO Auto-generated method stub
-//		try{
-//			HttpClient httpClient=new DefaultHttpClient();
-//			HttpContext localContext=new BasicHttpContext();
-//			HttpPost httpPost=new HttpPost(webAddressToPost);
-//			
-//			MultipartEntity entity=new MultipartEntity(HttpMultipartMode.B)
-//		}
-//		
+		try{
+			CloseableHttpClient httpClient=HttpClients.createDefault();
+			
+			HttpPost httpPost=new HttpPost("http://192.168.2.69:8065/api/upload");
+			
+			MultipartEntityBuilder builder= MultipartEntityBuilder.create();
+			builder.addTextBody
+		}
+	
 		return null;
 		
 		

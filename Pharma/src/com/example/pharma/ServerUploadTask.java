@@ -43,12 +43,14 @@ public class ServerUploadTask extends AsyncTask<Void, Void, String>{
 	protected String doInBackground(Void... params) {
 		String result="";
 		
+		
 		// TODO Auto-generated method stub
 		try{
 			HttpClient httpClient=new DefaultHttpClient();
 			
 			HttpPost httpPost=new HttpPost("http://192.168.2.69:8065/api/upload");
-			FileBody bin=new FileBody(new File("image"));
+			
+			FileBody bin=new FileBody(new File("newImage"));
 			
 			MultipartEntityBuilder builder= MultipartEntityBuilder.create();
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);

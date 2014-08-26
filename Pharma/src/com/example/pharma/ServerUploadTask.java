@@ -48,7 +48,7 @@ public class ServerUploadTask extends AsyncTask<Void, Void, String>{
 		try{
 			HttpClient httpClient=new DefaultHttpClient();
 			
-			HttpPost httpPost=new HttpPost("http://192.168.2.69:8065/api/upload");
+			HttpPost httpPost=new HttpPost("http://46.137.213.164:8112/api/upload");
 			
 			FileBody bin=new FileBody(new File("newImage"));
 			

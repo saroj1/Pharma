@@ -1,8 +1,13 @@
 package com.example.pharma;
 
+import java.io.File;
+
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,7 +19,7 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
-		
+	 private final int CAMERA_RESULT = 1;
 		ImageButton ib1,ib2;
 		ImageView iv;
 		Intent i;
@@ -51,18 +56,30 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				
+				PackageManager pm=getPackageManager();
 				i=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-				startActivityForResult(i,cameraData);
-			}
+				i.putExtra(MediaStore.EXTRA_OUTPUT, MyFileContentProvider.CONTENT_URI);
+				//startActivityForResult(i,cameraData);
+				startActivityForResult(i, CAMERA_RESULT);
+			} 
 		});
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode==RESULT_OK){
-			Bundle extras=data.getExtras();
-			bmp=(Bitmap)extras.get("data");
+		
+		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT){
+			File out=new File(getFilesDir(),"newImage.jpg");
+			if(!out.exists()){
+				Toast.makeText(getBaseContext(),
+						"Error while capturing image", Toast.LENGTH_LONG).show();
+				return;
+			}
+			//Bundle extras=data.getExtras();
+			//bmp=(Bitmap)extras.get("data");
+			bmp=BitmapFactory.decodeFile(out.getAbsolutePath());
 			iv.setImageBitmap(bmp);
 			ib1.setVisibility(View.VISIBLE);
 			ib2.setVisibility(View.INVISIBLE);

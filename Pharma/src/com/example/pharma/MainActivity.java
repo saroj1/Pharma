@@ -1,12 +1,17 @@
 package com.example.pharma;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -22,12 +27,13 @@ public class MainActivity extends ActionBarActivity {
 	 private final int CAMERA_RESULT = 1;
 		ImageButton ib1,ib2;
 		ImageView iv;
-		Intent i;
+		Intent intent;
 		int cameraResults;
 		final static  int cameraData=0;
 		Bitmap bmp;
 		EditText etxt1,etxt2,etxt3;
 		boolean check;
+		String mCurrentPhotoPath;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,29 +63,65 @@ public class MainActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				
-				PackageManager pm=getPackageManager();
-				i=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-				i.putExtra(MediaStore.EXTRA_OUTPUT, MyFileContentProvider.CONTENT_URI);
+				//PackageManager pm=getPackageManager();
+				//intent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+				//intent.putExtra(MediaStore.EXTRA_OUTPUT, MyFileContentProvider.CONTENT_URI);
 				//startActivityForResult(i,cameraData);
-				startActivityForResult(i, CAMERA_RESULT);
+				//startActivityForResult(intent, CAMERA_RESULT);
+				intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				if(intent.resolveActivity(getPackageManager())!=null){
+					//create the file where the photo should go
+					File photoFile=null;
+					try{
+						photoFile=createImageFile();
+					}catch(IOException e){
+						e.printStackTrace();
+					}
+					//continue only if the file was successfully created
+					if(photoFile!=null){
+						intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+						startActivityForResult(intent, CAMERA_RESULT);
+					}
+					
+				}
+			}
+
+			private File createImageFile() throws IOException{
+				// TODO Auto-generated method stub
+				//creating a file name
+				String timeStamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+				String imageFileName="JPEG_"+timeStamp+"_";
+				//creating a path to store image
+				File storageDir=Environment.getExternalStoragePublicDirectory(
+						Environment.DIRECTORY_PICTURES);
+			//from here it is giving exception
+				File image=File.createTempFile(imageFileName,/*prefix*/
+						".jpg"/*suffix*/
+						,storageDir /*directory*/);
+				
+												
+				// save a file path 
+				mCurrentPhotoPath="file:"+image.getAbsolutePath();
+				return image;
 			} 
 		});
+		
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
+		//super.onActivityResult(requestCode, resultCode, data);
 		
 		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT){
-			File out=new File(getFilesDir(),"newImage.jpg");
-			if(!out.exists()){
-				Toast.makeText(getBaseContext(),
-						"Error while capturing image", Toast.LENGTH_LONG).show();
-				return;
-			}
-			//Bundle extras=data.getExtras();
-			//bmp=(Bitmap)extras.get("data");
-			bmp=BitmapFactory.decodeFile(out.getAbsolutePath());
+			//File out=new File(getFilesDir(),"newImage.jpg");
+			//if(!out.exists()){
+			//	Toast.makeText(getBaseContext(),
+			//			"Error while capturing image", Toast.LENGTH_LONG).show();
+			//	return;
+			//}
+			Bundle extras=data.getExtras();
+			bmp=(Bitmap)extras.get("data");
+			//bmp=BitmapFactory.decodeFile(out.getAbsolutePath());
 			iv.setImageBitmap(bmp);
 			ib1.setVisibility(View.VISIBLE);
 			ib2.setVisibility(View.INVISIBLE);
@@ -123,9 +165,8 @@ public class MainActivity extends ActionBarActivity {
 			String mobile=etxt3.getText().toString();
 			
 			
-//			if(name.trim().endsWith("")){
-//				Toast toast=Toast.makeText(getBaseContext(), "Please enter your name", duration);
-//				toast.show();} 
+
+			//checking fields are filled or not
 			if(TextUtils.isEmpty(name)) {
 			  Toast toast=  Toast.makeText(getBaseContext(), "Please enter your Name ", duration);
 			  toast.show();
@@ -142,9 +183,9 @@ public class MainActivity extends ActionBarActivity {
 				return;
 			}
 		else {
-			new ServerUploadTask().execute();
-//			Toast toast=Toast.makeText(getBaseContext(), "something", duration);
-//			toast.show();
+		//	new ServerUploadTask().execute();
+			Toast toast=Toast.makeText(getBaseContext(), "something", duration);
+			toast.show();
 		}
 			
 			

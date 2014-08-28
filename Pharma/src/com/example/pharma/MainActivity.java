@@ -40,7 +40,8 @@ public class MainActivity extends ActionBarActivity {
 		EditText etxt1,etxt2,etxt3;
 		boolean check;
 		String mCurrentPhotoPath;
-private String selectedImagePath="";
+		File photoFile=null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,7 +78,7 @@ private String selectedImagePath="";
 				intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 				if(intent.resolveActivity(getPackageManager())!=null){
 					//create the file where the photo should go
-					File photoFile=null;
+					//File photoFile=null;
 					try{
 						photoFile=createImageFile();
 					}catch(IOException e){
@@ -102,7 +103,7 @@ private String selectedImagePath="";
 				//creating a path to store image
 				File storageDir=Environment.getExternalStoragePublicDirectory(
 						Environment.DIRECTORY_PICTURES);
-			
+			//creating tempfile 
 				File image=File.createTempFile(imageFileName,/*prefix*/
 						".jpg"/*suffix*/
 						,storageDir /*directory*/);
@@ -110,6 +111,7 @@ private String selectedImagePath="";
 				System.out.println(image);							
 				// save a file path 
 				mCurrentPhotoPath="file:"+image.getAbsolutePath();
+				//returning tempfile
 				return image;
 						
 			} 
@@ -121,7 +123,21 @@ private String selectedImagePath="";
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		iv=(ImageView)findViewById(R.id.ivReturnedPic);
-		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT && null!=data){
+		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT && data!=null){
+			
+			// displaying image
+			String[] fileColumn={MediaStore.Images.Media.DATA };
+			//cursor class provides random read-write access 
+			//contentresolver class provide the basic create,retrieve,update and delete functions of persistent storage
+			//
+			Cursor cursor=getContentResolver().query(Uri.fromFile(photoFile), fileColumn, null,null,null);
+			String contentPath=null;
+			if(cursor.moveToFirst()){
+				contentPath=cursor.getString(cursor.getColumnIndex(fileColumn[0]));
+				
+				Bitmap bmp=BitmapFactory.decodeFile(contentPath);
+				iv.setImageBitmap(bmp);
+			}
 			
 			/* old method 
 			Bundle extras=data.getExtras();
@@ -130,12 +146,12 @@ private String selectedImagePath="";
 			
 			
 			//iv.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-			
+			/*
 			Bitmap bitmap=BitmapFactory.decodeFile(mCurrentPhotoPath);
 			iv.setImageBitmap(bitmap);
 			ib1.setVisibility(View.VISIBLE);
 			ib2.setVisibility(View.INVISIBLE);
-			submit();
+			submit(); */
 		}
 	}
 

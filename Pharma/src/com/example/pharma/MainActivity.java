@@ -1,18 +1,24 @@
 package com.example.pharma;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
+import android.provider.MediaStore.MediaColumns;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -34,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
 		EditText etxt1,etxt2,etxt3;
 		boolean check;
 		String mCurrentPhotoPath;
-
+private String selectedImagePath="";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,7 +85,8 @@ public class MainActivity extends ActionBarActivity {
 					}
 					//continue only if the file was successfully created
 					if(photoFile!=null){
-						intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+						intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+						 System.out.println(Uri.fromFile(photoFile));
 						startActivityForResult(intent, CAMERA_RESULT);
 					}
 					
@@ -88,21 +95,23 @@ public class MainActivity extends ActionBarActivity {
 
 			private File createImageFile() throws IOException{
 				// TODO Auto-generated method stub
+				
 				//creating a file name
 				String timeStamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 				String imageFileName="JPEG_"+timeStamp+"_";
 				//creating a path to store image
 				File storageDir=Environment.getExternalStoragePublicDirectory(
 						Environment.DIRECTORY_PICTURES);
-			//from here it is giving exception
+			
 				File image=File.createTempFile(imageFileName,/*prefix*/
 						".jpg"/*suffix*/
 						,storageDir /*directory*/);
 				
-												
+				System.out.println(image);							
 				// save a file path 
 				mCurrentPhotoPath="file:"+image.getAbsolutePath();
 				return image;
+						
 			} 
 		});
 		
@@ -110,42 +119,29 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
-		//super.onActivityResult(requestCode, resultCode, data);
-		
-		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT){
-			//File out=new File(getFilesDir(),"newImage.jpg");
-			//if(!out.exists()){
-			//	Toast.makeText(getBaseContext(),
-			//			"Error while capturing image", Toast.LENGTH_LONG).show();
-			//	return;
-			//}
+		super.onActivityResult(requestCode, resultCode, data);
+		iv=(ImageView)findViewById(R.id.ivReturnedPic);
+		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT && null!=data){
+			
+			/* old method 
 			Bundle extras=data.getExtras();
 			bmp=(Bitmap)extras.get("data");
-			//bmp=BitmapFactory.decodeFile(out.getAbsolutePath());
-			iv.setImageBitmap(bmp);
+			iv.setImageBitmap(bmp);*/
+			
+			
+			//iv.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
+			
+			Bitmap bitmap=BitmapFactory.decodeFile(mCurrentPhotoPath);
+			iv.setImageBitmap(bitmap);
 			ib1.setVisibility(View.VISIBLE);
 			ib2.setVisibility(View.INVISIBLE);
 			submit();
 		}
 	}
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.main, menu);
-//		return true;
-//	}
-//
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		// Handle action bar item clicks here. The action bar will
-//		// automatically handle clicks on the Home/Up button, so long
-//		// as you specify a parent activity in AndroidManifest.xml.
-//		int id = item.getItemId();
-//		if (id == R.id.action_settings) {
-//			return true;
-//		}
-//		return super.onOptionsItemSelected(item);
-//	}
+
+	
+	
+	
 
 	private void submit() {
 		

@@ -133,10 +133,15 @@ public class MainActivity extends ActionBarActivity {
 			Cursor cursor=getContentResolver().query(Uri.fromFile(photoFile), fileColumn, null,null,null);
 			String contentPath=null;
 			if(cursor.moveToFirst()){
+				//passing uri to contentpath
 				contentPath=cursor.getString(cursor.getColumnIndex(fileColumn[0]));
 				
 				Bitmap bmp=BitmapFactory.decodeFile(contentPath);
 				iv.setImageBitmap(bmp);
+			} else if(resultCode==RESULT_CANCELED){
+				Toast.makeText(this, "image Capture cancelled", Toast.LENGTH_LONG).show();
+			}else{
+				Toast.makeText(this, "image Ca[tured failed", Toast.LENGTH_LONG).show();
 			}
 			
 			/* old method 

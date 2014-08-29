@@ -1,26 +1,21 @@
 package com.example.pharma;
 
 import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.provider.MediaStore.Audio.Media;
-import android.provider.MediaStore.MediaColumns;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -29,19 +24,19 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
-
-	 private final int CAMERA_RESULT = 1;
-		ImageButton ib1,ib2;
+      private final int CAMERA_RESULT=1; //result code
+	 	ImageButton ib1,ib2;
 		ImageView iv;
 		Intent intent;
 		int cameraResults;
 		final static  int cameraData=0;
 		Bitmap bmp;
-		EditText etxt1,etxt2,etxt3;
+		EditText etxt1,etxt2,etxt3;                                  
 		boolean check;
 		String mCurrentPhotoPath;
 		File photoFile=null;
-
+		Uri uri;
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -87,22 +82,26 @@ public class MainActivity extends ActionBarActivity {
 					//continue only if the file was successfully created
 					if(photoFile!=null){
 						intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-						 System.out.println(Uri.fromFile(photoFile));
+						uri=Uri.fromFile(photoFile);
+						Log.e("tag", uri.toString());
 						startActivityForResult(intent, CAMERA_RESULT);
 					}
-					
+					 
 				}
 			}
 
 			private File createImageFile() throws IOException{
 				// TODO Auto-generated method stub
 				
-				//creating a file name
+				File storageDir=Environment.getExternalStoragePublicDirectory(
+						Environment.DIRECTORY_PICTURES);
+				
 				String timeStamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 				String imageFileName="JPEG_"+timeStamp+"_";
 				//creating a path to store image
-				File storageDir=Environment.getExternalStoragePublicDirectory(
-						Environment.DIRECTORY_PICTURES);
+				//File storageDir=Environment.getExternalStoragePublicDirectory(
+				//		Environment.DIRECTORY_PICTURES);
+			
 			//creating tempfile 
 				File image=File.createTempFile(imageFileName,/*prefix*/
 						".jpg"/*suffix*/
@@ -113,7 +112,7 @@ public class MainActivity extends ActionBarActivity {
 				mCurrentPhotoPath="file:"+image.getAbsolutePath();
 				//returning tempfile
 				return image;
-						
+
 			} 
 		});
 		
@@ -123,25 +122,18 @@ public class MainActivity extends ActionBarActivity {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		iv=(ImageView)findViewById(R.id.ivReturnedPic);
-		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT && data!=null){
+		if(resultCode==RESULT_OK && requestCode==CAMERA_RESULT){
 			
-			// displaying image
-			String[] fileColumn={MediaStore.Images.Media.DATA };
-			//cursor class provides random read-write access 
-			//contentresolver class provide the basic create,retrieve,update and delete functions of persistent storage
-			//
-			Cursor cursor=getContentResolver().query(Uri.fromFile(photoFile), fileColumn, null,null,null);
-			String contentPath=null;
-			if(cursor.moveToFirst()){
-				//passing uri to contentpath
-				contentPath=cursor.getString(cursor.getColumnIndex(fileColumn[0]));
-				
-				Bitmap bmp=BitmapFactory.decodeFile(contentPath);
+			
+				Bitmap bmp=BitmapFactory.decodeFile(photoFile.toString());
 				iv.setImageBitmap(bmp);
+				ib1.setVisibility(View.VISIBLE);
+				ib2.setVisibility(View.INVISIBLE);
+				submit();
 			} else if(resultCode==RESULT_CANCELED){
 				Toast.makeText(this, "image Capture cancelled", Toast.LENGTH_LONG).show();
 			}else{
-				Toast.makeText(this, "image Ca[tured failed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "image Captured failed", Toast.LENGTH_LONG).show();
 			}
 			
 			/* old method 
@@ -157,7 +149,7 @@ public class MainActivity extends ActionBarActivity {
 			ib1.setVisibility(View.VISIBLE);
 			ib2.setVisibility(View.INVISIBLE);
 			submit(); */
-		}
+		//}
 	}
 
 	
@@ -174,12 +166,12 @@ public class MainActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				int duration=Toast.LENGTH_LONG;
 				// TODO Auto-generated method stub
-				etxt1=(EditText)findViewById(R.id.et1);
-			String	name=etxt1.getText().toString();
-			etxt2=(EditText)findViewById(R.id.et2);
-			String add=etxt2.getText().toString();
-			etxt3=(EditText)findViewById(R.id.et3);
-			String mobile=etxt3.getText().toString();
+			etxt1			=	(EditText)findViewById(R.id.et1);
+			String	name	=	etxt1.getText().toString();
+			etxt2			=	(EditText)findViewById(R.id.et2);
+			String add		=	etxt2.getText().toString();
+			etxt3			=	(EditText)findViewById(R.id.et3);
+			String mobile	=	etxt3.getText().toString();
 			
 			
 
@@ -200,7 +192,8 @@ public class MainActivity extends ActionBarActivity {
 				return;
 			}
 		else {
-		//	new ServerUploadTask().execute();
+			new ServerUploadTask().execute();
+			
 			Toast toast=Toast.makeText(getBaseContext(), "something", duration);
 			toast.show();
 		}
@@ -209,4 +202,6 @@ public class MainActivity extends ActionBarActivity {
 			}
 		});
 	}
+	
+	
 }
